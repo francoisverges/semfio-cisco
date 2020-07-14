@@ -1,0 +1,43 @@
+{
+  "ewc": {
+    "name": "C9800-APoS-Survey",
+    "ip": "192.168.20.100",
+    "netmask": "255.255.255.0",
+    "username": "admin",
+    "password": "SemFioAPoS123!"
+  },
+  "wlans": [
+    {
+      "name": "Survey-5",
+      "ssid": "Cisco Survey-5",
+      "psk": "SemFio123"
+    },
+    {
+      "name": "Survey-24",
+      "ssid": "Cisco Survey-2.4",
+      "psk": "SemFio123"
+    }
+  ],
+  "ap": {
+    "mac": "2CF89B216E1C",
+    "fra_ap": "true",
+    "name": "Survey-AP",
+    "ip": "192.168.20.101",
+    "netmask": "255.255.255.0",
+    "gateway": "192.168.20.1",
+    "band_5": {
+      "channel": "44",
+      "bandwidth": "20",
+      "tx-power": "6"
+    },
+    "band_24": {
+      "channel": "1",
+      "tx-power": "5"
+    },
+    "band_fra": {
+      "channel": "1",
+      "bandwidth": "20",
+      "tx-power": "5"
+    }
+  }
+}

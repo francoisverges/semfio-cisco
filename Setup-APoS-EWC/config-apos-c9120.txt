@@ -1,0 +1,76 @@
+enable
+
+! Configure the ap name
+ap name AP2CF8.9B21.6E1C name Survey-AP
+
+conf t
+
+! Configure the EWC Name
+hostname C9800-APoS-Survey
+
+! Configure the static IP address of the controller
+interface gigabitEthernet 0
+ip address 192.168.20.100 255.255.255.0
+
+! Create admin username and password
+username admin privilege 15 password SemFioAPoS123!
+
+! Configure the AP profile (use same username and password)
+ap profile default-ap-profile
+mgmtuser username admin password 0 SemFioAPoS123! secret 0 SemFioAPoS123!
+
+! Configure the WLANs
+wlan Survey-5 1 Survey-5
+no security wpa akm dot1x
+security wpa psk set-key ascii 0 SemFio123
+security wpa akm psk
+no shutdown
+exit
+wlan Survey-24 2 Survey-2.4
+no security wpa akm dot1x
+security wpa psk set-key ascii 0 SemFio123
+security wpa akm psk
+no shutdown
+exit
+
+! Configure the Wireless Profile Policy
+wireless profile policy Survey-5
+no central association
+no central dhcp
+no central switching
+http-tlv-caching
+session-timeout 86400
+no shutdown
+exit
+wireless profile policy Survey-24
+no central association
+no central dhcp
+no central switching
+http-tlv-caching
+session-timeout 86400
+no shutdown
+exit
+
+! Configure the Default Policy Tag
+wireless tag policy default-policy-tag
+wlan Survey-5 policy Survey-5
+wlan Survey-24 policy Survey-24
+exit
+
+! Configure Global Encryption
+service password-encryption
+password encryption aes
+key config-key newpass SemFioAPoS123!
+end
+
+! Configure AP Radio Settings
+ap name Survey-AP dot11 dual-band channel 1
+ap name Survey-AP dot11 5ghz channel 44
+ap name Survey-AP dot11 dual-band txpower 5
+ap name Survey-AP dot11 5ghz txpower 6
+
+! Configure the static IP address of the AP
+ap name Survey-AP static-ip ip-address 192.168.20.101 netmask 255.255.255.0 gateway 192.168.20.1
+
+! Save Configurations
+write memory
