@@ -1,4 +1,5 @@
 {
+  "tty": "/dev/tty.AirConsole-68-raw-serial",
   "ewc": {
     "name": "C9800-APoS-Survey",
     "ip": "192.168.20.100",

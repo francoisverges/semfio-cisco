@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+
+"""
+Written by François Vergès (@VergesFrancois)
+Created on: July 12, 2020
+
+This scripts configures a Cisco AP running IOS-XE for an AP-on-a-Stick site survey
+"""
+
 import argparse
 import sys
 import json
@@ -6,7 +15,22 @@ import time
 from time import sleep
 
 
-def send_to_console(ser: serial.Serial, command: str, wait_time: float = 0.4):
+def send_to_console(ser: serial.Serial, command: str, wait_time: float = 0.5):
+    """ Sends a command to the console connection and print the output
+
+    This function sends a specific command through the console connection to
+    the access point.
+    It then waits for the command to be executed and displays the output that
+    the AP is sending us back.
+    By default, we wait 0.5sec for the command to be executed. For some commands,
+    we need to wait for more than, so we can specify the wait time using the
+    wait_time argument.
+
+    Args:
+        ser: serial connection
+        command: str, defining the command we are sending to the AP
+        wait_time: float, amount of time to wait for the command to be executed
+    """
     command_to_send = command + "\r"
     ser.write(command_to_send.encode('utf-8'))
     sleep(wait_time)
@@ -14,13 +38,29 @@ def send_to_console(ser: serial.Serial, command: str, wait_time: float = 0.4):
 
 
 def configure_APoS(configs: dict):
-    with serial.Serial('/dev/tty.AirConsole-68-raw-serial', timeout=1) as ser:
+    """ Open a serial connection and configure the AP
+
+    This function opens a serial connection to the AP. The TTY to be used for this
+    serial connection has to be specified in the configuration file.
+        ex: "/dev/tty.AirConsole-68-raw-serial"
+
+    Once the serial connection is open, we are sending commands to configure
+    the AP for an APoS site survey.
+
+    The set of configuration sent perform the following:
+        - Initial setup of the EWC controller
+        - Configuration of the WLAN profiles defined in the configuration file
+        - Configuration of the AP network settings
+        - Configuration of the AP radio settings
+
+    Args:
+        configs: dict, containing the content of the configuration file
+    """
+    with serial.Serial(configs['tty'], timeout=1) as ser:
         print(f"Connecting to {ser.name}...")
 
         # Initial Connection
-        ser.write(b'\r')
-        ser.write(b'end\r')
-        sleep(0.5)
+        send_to_console(ser, "")
         send_to_console(ser, "", wait_time=1)
 
         # Move to the enable mode
@@ -47,8 +87,7 @@ def configure_APoS(configs: dict):
 
         # Configure the static IP address of the controller
         send_to_console(ser, "interface gigabitEthernet 0")
-        command = f"ip address {configs['ewc']['ip']} 255.255.255.0\r"
-        send_to_console(ser, f"ip address {configs['ewc']['ip']} 255.255.255.0")
+        send_to_console(ser, f"ip address {configs['ewc']['ip']} 255.255.255.0", wait_time=3)
 
         # Create admin username and password
         command = f"username {configs['ewc']['username']} privilege 15 password {configs['ewc']['password']}"
@@ -96,11 +135,10 @@ def configure_APoS(configs: dict):
         # Wait for the AP to join the controller again
         print("\rWaiting for the AP to join the controller (it takes about 1min)", end="")
         sleep(1)
-        for i in range(0, 10):
+        for i in range(0, 70):
             sys.stdout.write(".")
             sys.stdout.flush()
             sleep(1)
-        print("\r")
 
         # Configure AP Radio Settings
         if configs['ap']['fra_ap'] == "true":
@@ -118,13 +156,23 @@ def configure_APoS(configs: dict):
 
         # Configure the static IP address of the AP
         command = f"ap name {configs['ap']['name']} static-ip ip-address {configs['ap']['ip']} netmask {configs['ap']['netmask']} gateway {configs['ap']['gateway']}\r"
-        send_to_console(ser, command)
+        send_to_console(ser, command, wait_time=1)
 
         # Save Configurations
         send_to_console(ser, "write memory")
 
+    print("Now, wait for the AP to reboot and start broadcasting the survey SSID!")
+    print("Happy Site Survey!")
+
 
 def main():
+    """ Main function
+
+    This function handle the arguments of the script and place the content of the
+    configuration file into a dictionary called "configs".
+
+    It then execute the "configure_APoS" function which will configure the AP.
+    """
     parser = argparse.ArgumentParser(description='Configures a Mist AP for an APoS site survey')
     parser.add_argument('config', metavar='config_file', type=argparse.FileType(
         'r'), help='file containing all the configuration information')
@@ -135,7 +183,7 @@ def main():
 
 if __name__ == '__main__':
     start_time = time.time()
-    print('** Setting up APoS AP')
+    print('** Setting up Cisco C9800 APoS AP')
     main()
     run_time = time.time() - start_time
     print("\n** Time to run: %s sec" % round(run_time, 2))
