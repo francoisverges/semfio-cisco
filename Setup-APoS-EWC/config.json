@@ -11,12 +11,14 @@
     {
       "name": "Survey-5",
       "ssid": "Cisco Survey-5",
-      "psk": "SemFio123"
+      "psk": "SemFio123",
+      "band": "5"
     },
     {
       "name": "Survey-24",
       "ssid": "Cisco Survey-2.4",
-      "psk": "SemFio123"
+      "psk": "SemFio123",
+      "band": "2.4"
     }
   ],
   "ap": {

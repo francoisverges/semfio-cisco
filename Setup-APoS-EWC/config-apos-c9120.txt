@@ -26,12 +26,14 @@ mgmtuser username admin password 0 SemFioAPoS123! secret 0 SemFioAPoS123!
 
 ! Configure the WLANs
 wlan Survey-5 1 Survey-5
+radio dot11a
 no security wpa akm dot1x
 security wpa psk set-key ascii 0 SemFio123
 security wpa akm psk
 no shutdown
 exit
 wlan Survey-24 2 Survey-2.4
+radio dot11g
 no security wpa akm dot1x
 security wpa psk set-key ascii 0 SemFio123
 security wpa akm psk

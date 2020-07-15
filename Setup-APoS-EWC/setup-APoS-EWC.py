@@ -102,6 +102,10 @@ def configure_APoS(configs: dict):
         i = 1
         for wlan in configs['wlans']:
             send_to_console(ser, f"wlan {wlan['name']} {i} \"{wlan['ssid']}\"")
+            if wlan['band'] == "5":
+                send_to_console(ser, "radio dot11a")
+            elif wlan['band'] == "2.4":
+                send_to_console(ser, "radio dot11g")
             send_to_console(ser, "no security wpa akm dot1x")
             send_to_console(ser, f"security wpa psk set-key ascii 0 {wlan['psk']}")
             send_to_console(ser, "security wpa akm psk")
