@@ -10,6 +10,9 @@ line console 0
 logging sync
 exit
 
+! Enabling NETCONF (We never know!)
+netconf-yang
+
 ! Configure the EWC Name
 hostname C9800-APoS-Survey
 

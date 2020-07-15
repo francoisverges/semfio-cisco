@@ -81,6 +81,9 @@ def configure_APoS(configs: dict):
         send_to_console(ser, "logging sync")
         send_to_console(ser, "exit")
 
+        # Enabling NETCONF (we never know)
+        send_to_console(ser, "netconf-yang")
+
         # Configure the EWC name
         command = f"hostname {configs['ewc']['name']}"
         send_to_console(ser, command)
